@@ -1,0 +1,122 @@
+<?php
+// === SECURITY: Prevent direct browser access ===
+$allowed = false;
+
+// 1. Same-origin via Referer
+if (!empty($_SERVER['HTTP_REFERER'])) {
+    $refererHost = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
+    $currentHost = $_SERVER['HTTP_HOST'] ?? '';
+    if ($refererHost === $currentHost) {
+        $allowed = true;
+    }
+}
+
+// 2. Same-origin via Origin header (modern browsers send this on fetch)
+if (!$allowed && !empty($_SERVER['HTTP_ORIGIN'])) {
+    $originHost = parse_url($_SERVER['HTTP_ORIGIN'], PHP_URL_HOST);
+    $currentHost = $_SERVER['HTTP_HOST'] ?? '';
+    if ($originHost === $currentHost) {
+        $allowed = true;
+    }
+}
+
+// 3. Allow if the constant is defined (when the file is included properly)
+if (defined('IN_APP')) {
+    $allowed = true;
+}
+
+if (!$allowed) {
+    header('HTTP/1.0 403 Forbidden');
+    exit('Direct access not allowed');
+}
+// ===============================================
+
+// Headers for JSON-only response
+header('Content-Type: application/json');
+header('X-Content-Type-Options: nosniff');
+header('Strict-Transport-Security: max-age=31536000');
+header('Cache-Control: no-store'); // Simplified, no-store is sufficient
+header('Expires: 0'); // Included for compatibility
+// Optional: header('Referrer-Policy: strict-origin-when-cross-origin');
+
+// COMMENT OUT THIS BLOCK FOR LOCAL DEVELOPMENT
+/*
+if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+    header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+    exit();
+}
+*/
+
+$chatFile = 'temp_talk_silver.json';
+$messageExpirationTime = 300; // 5 minutes in seconds
+
+function loadMessages($file, $expirationTime)
+{
+    try {
+        $currentTime = time();
+        
+        if (file_exists($file)) {
+            $data = json_decode(file_get_contents($file), true);
+            
+            if ($data && isset($data['messages'])) {
+                $messages = [];
+                
+                foreach ($data['messages'] as $message) {
+                    if (!isset($message['timestamp'])) {
+                        error_log("Message missing timestamp: " . json_encode($message));
+                        continue;
+                    }
+                    $timeSinceMessage = $currentTime - $message['timestamp'];
+                    if ($timeSinceMessage < $expirationTime) {
+                        $messages[] = [
+                            'content' => $message['content'],
+                            'timestamp' => $message['timestamp']
+                        ];
+                    } else {
+                        error_log("Expiring message: " . json_encode($message) . " (age: $timeSinceMessage seconds)");
+                    }
+                }
+                
+                if (count($messages) !== count($data['messages'])) {
+                    saveMessages($file, $messages, $currentTime);
+                }
+                
+                error_log("Returning " . count($messages) . " messages after filtering");
+                return $messages;
+            }
+        }
+        return [];
+    } catch (Exception $e) {
+        error_log("Error loading messages: " . $e->getMessage());
+        return [];
+    }
+}
+
+function saveMessages($file, $messages, $timestamp)
+{
+    try {
+        $data = [
+            'messages' => $messages,
+            'last_activity' => $timestamp
+        ];
+        if (!file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT), LOCK_EX)) {
+            error_log("Failed to write messages to $file in saveMessages");
+            return false;
+        }
+        chmod($file, 0600);
+        error_log("Saved messages: " . count($messages) . " at " . date('Y-m-d H:i:s', $timestamp));
+        return true;
+    } catch (Exception $e) {
+        error_log("Error saving messages: " . $e->getMessage());
+        return false;
+    }
+}
+
+try {
+    $messages = loadMessages($chatFile, $messageExpirationTime);
+    echo json_encode($messages);
+} catch (Exception $e) {
+    error_log("Error in fetch_messages_silver.php: " . $e->getMessage());
+    echo json_encode(['success' => false, 'error' => 'Failed to fetch messages']);
+}
+?>
