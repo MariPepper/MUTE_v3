@@ -214,6 +214,8 @@ $nonce = base64_encode(openssl_random_pseudo_bytes(16));
                 <div class="success"><?php echo htmlspecialchars($success); ?></div>
             <?php endif; ?>
 
+            <p>The maximum file size allowed by this application is 10 MB.</p>
+
             <form class="chat-form" id="uploadForm" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="peerId" id="peerId">
                 <div class="form-group">
