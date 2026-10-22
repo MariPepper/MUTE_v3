@@ -19,6 +19,7 @@ $nonce = base64_encode(random_bytes(16));
 <body>
     <h1>Metadata Scrambler</h1>
     <p>Upload a file to scramble its metadata. Supported formats: JPEG, PNG, GIF, BMP, WebP, PDF, MP3, DOC, DOCX.</p>
+    <p>The maximum file size allowed by this application is 10 MB.</p>
     <div id="dropZone">Drag & drop files here or click to upload</div>
     <input type="file" id="fileInput" multiple accept="image/jpeg,image/png,image/gif,image/bmp,image/webp,application/pdf,audio/mpeg,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
     <div id="status"></div>
