@@ -141,7 +141,7 @@ class MetadataScrambler
         imagecopyresampled($finalImage, $tempImage, 0, 0, 0, 0,
                            $width, $height, $width - 1, $height - 1);
         
-        imagedestroy($tempImage);
+        $tempImage = null;
         
         $this->writeLog("Applied micro-resize hash obfuscation");
         return $finalImage;
@@ -205,11 +205,11 @@ class MetadataScrambler
             $quality = max(85, min(100, $quality)); // Keep within reasonable bounds
             
             if (!imagejpeg($image, $outputPath, $quality)) {
-                imagedestroy($image);
+                $image = null;
                 $this->writeLog("Failed to save processed JPEG to $outputPath");
                 return false;
             }
-            imagedestroy($image);
+            $image = null;
 
             // Add metadata as before
             if (!$this->options['strip_only'] && $metadata) {
@@ -660,11 +660,11 @@ class MetadataScrambler
             }
 
             if (!imagepng($image, $outputPath)) {
-                imagedestroy($image);
+                $image = null;
                 $this->writeLog("Failed to save PNG to $outputPath");
                 return false;
             }
-            imagedestroy($image);
+            $image = null;
 
             if (!$this->options['strip_only'] && $metadata) {
                 if (!$this->addPngTextChunks($outputPath, $metadata)) {
@@ -753,11 +753,11 @@ class MetadataScrambler
             }
 
             if (!imagegif($image, $outputPath)) {
-                imagedestroy($image);
+                $image = null;
                 $this->writeLog("Failed to save GIF to $outputPath");
                 return false;
             }
-            imagedestroy($image);
+            $image = null;
 
             if (!$this->options['strip_only'] && $metadata) {
                 if (!$this->addGifXmp($outputPath, $metadata)) {
@@ -882,11 +882,11 @@ class MetadataScrambler
             // Save WebP with high quality to strip existing metadata
             $quality = $this->options['preserve_quality'] ? ($this->options['jpeg_quality'] ?? 95) : 90;
             if (!imagewebp($image, $outputPath, $quality)) {
-                imagedestroy($image);
+                $image = null;
                 $this->writeLog("Failed to save WebP to $outputPath");
                 return false;
             }
-            imagedestroy($image);
+            $image = null;
 
             // Add XMP metadata instead of EXIF
             if (!$this->options['strip_only'] && $metadata) {
@@ -1609,7 +1609,7 @@ class MetadataScrambler
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $filePath);
-        finfo_close($finfo);
+        $finfo = null;
 
         $this->writeLog("Detected MIME type for $filePath: $mimeType");
         return $mimeType;
@@ -1624,7 +1624,7 @@ class MetadataScrambler
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $actualMimeType = finfo_file($finfo, $filePath);
-        finfo_close($finfo);
+        $finfo = null;
 
         if ($actualMimeType !== $expectedMimeType) {
             $this->writeLog("MIME type mismatch: Expected $expectedMimeType, got $actualMimeType for $filePath");
