@@ -41,7 +41,6 @@ if (!$allowed) {
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if ($origin) {
     header("Access-Control-Allow-Origin: $origin");
-    header('Access-Control-Allow-Credentials: false');
 } else {
     header('Access-Control-Allow-Origin: *');
 }
