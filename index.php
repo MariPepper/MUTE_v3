@@ -14,6 +14,9 @@
     <meta http-equiv="Strict-Transport-Security" content="max-age=31536000;">
     <meta http-equiv="Content-Security-Policy"
         content="script-src 'self' 'nonce-<?php echo $nonce; ?>'; style-src 'self'; font-src 'self'; img-src 'self';">
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
     <title>Privacy Tools Dashboard</title>
     <link rel="stylesheet" href="dashboard.css">
 </head>
