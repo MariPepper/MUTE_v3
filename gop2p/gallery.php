@@ -200,6 +200,9 @@ $nonce = base64_encode(openssl_random_pseudo_bytes(16));
     <meta http-equiv="Strict-Transport-Security" content="max-age=31536000;">
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; script-src 'self' 'nonce-<?php echo $nonce; ?>' https://unpkg.com; style-src 'self'; font-src 'self'; img-src 'self'; connect-src 'self' ws: wss:;">
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
     <title>P2P File Transfer Gallery</title>
     <link rel="stylesheet" href="style-8.css">
     <script src="https://unpkg.com/simple-peer@9.11.0/simplepeer.min.js"></script>
