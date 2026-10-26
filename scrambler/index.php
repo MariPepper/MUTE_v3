@@ -13,6 +13,9 @@ $nonce = base64_encode(random_bytes(16));
     <meta http-equiv="Strict-Transport-Security" content="max-age=31536000;">
     <meta http-equiv="Content-Security-Policy" 
           content="default-src 'self'; script-src 'self' 'nonce-<?php echo $nonce; ?>'; style-src 'self'; font-src 'self'; img-src 'self';">
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
     <title>Metadata Scrambler</title>
     <link rel="stylesheet" href="style.css">
 </head>
